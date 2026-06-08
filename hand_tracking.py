@@ -45,6 +45,8 @@ detector = vision.HandLandmarker.create_from_options(options)
 
 cap = cv2.VideoCapture(0)
 
+trail = []
+
 while True:
     ret, frame = cap.read()
     frame = cv2.flip(frame, 1)
@@ -65,9 +67,14 @@ while True:
             index = hand[8]
             x = int(index.x * w)
             y = int(index.y * h)
-            draw_star(frame, (x, y), 15, (203, 192, 255))
-            print(f"Índice: x={x}, y={y}")
+            trail.append((x, y))
 
+            if len(trail) > 30:
+                trail.pop(0)
+
+            for i, pos in enumerate(trail):
+                size = int(5 + (i / len(trail)) * 15)
+                draw_star(frame, pos, size, (203, 192, 255))
     cv2.imshow("Hand Tracking", frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
